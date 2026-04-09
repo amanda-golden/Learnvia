@@ -382,7 +382,7 @@ elif st.session_state.level == 4:
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.session_state.get('l4_attempts', 0) >= 2 and not st.session_state.level_4_solved:
-            submit_btn_4 = st.button("Try Another Problem", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
+            submit_btn_4 = st.button("New Problem", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
             is_check_answer = False
         else:
             submit_btn_4 = st.button("Check Answer", use_container_width=True, type="primary")
