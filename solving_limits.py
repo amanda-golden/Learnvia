@@ -142,6 +142,7 @@ def initialize_state(target_level=1):
         'level_3_solved': False,
         'level_4_solved': False,
         'hint_level': 0,
+        'l4_attempts': 0,
         'error_1': None, 'error_2': None, 'error_3': None, 'error_4': None
     })
 
@@ -159,6 +160,7 @@ def refresh_mastery_problem(target_level=4):
         'a': a, 'b': b, 'c': c,
         'level': target_level,
         'level_4_solved': False,
+        'l4_attempts': 0,
         'error_4': None
     })
 
@@ -175,6 +177,10 @@ def increment_hint():
 
 if 'level' not in st.session_state:
     initialize_state()
+
+# Ensure attempt tracker exists if we update the app mid-session
+if 'l4_attempts' not in st.session_state:
+    st.session_state.l4_attempts = 0
 
 levels_solved = [
     st.session_state.level_1_solved,
@@ -375,14 +381,20 @@ elif st.session_state.level == 4:
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        submit_btn_4 = st.button("Check Answer", use_container_width=True, type="primary")
+        if st.session_state.get('l4_attempts', 0) >= 2 and not st.session_state.level_4_solved:
+            submit_btn_4 = st.button("Try Another Problem", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
+            is_check_answer = False
+        else:
+            submit_btn_4 = st.button("Check Answer", use_container_width=True, type="primary")
+            is_check_answer = True
+
     with col2:
         st.markdown('<div class="stuck-anchor"></div>', unsafe_allow_html=True)
-        st.button("New Problem", on_click=refresh_mastery_problem, use_container_width=True)
+        st.button("New Problem", on_click=refresh_mastery_problem, use_container_width=True, key="new_prob_btn_4")
     with col3:
         st.button("Back to Practice", on_click=advance_level, args=(1,), use_container_width=True)
 
-    if submit_btn_4:
+    if submit_btn_4 and is_check_answer:
         if answer_field:
             expected_val = 1 / st.session_state.a
             try:
@@ -392,7 +404,11 @@ elif st.session_state.level == 4:
                     st.session_state.error_4 = None
                     st.balloons()
                 else:
-                    st.session_state.error_4 = "✗ Incorrect. Try mapping out your factorization steps on the scratchpad!"
+                    st.session_state.l4_attempts += 1
+                    if st.session_state.l4_attempts >= 2:
+                        st.session_state.error_4 = f"✗ Incorrect. The correct answer is **1/{st.session_state.a}**. Review the explanation below and click 'Try Another Problem'."
+                    else:
+                        st.session_state.error_4 = "✗ Incorrect. Try mapping out your factorization steps on the scratchpad! (1 attempt remaining)"
             except (SympifyError, ValueError, TypeError):
                  st.session_state.error_4 = "⚠️ Please enter a valid number or fraction."
 
@@ -400,9 +416,10 @@ elif st.session_state.level == 4:
         st.markdown('<div class="custom-error-anchor"></div>', unsafe_allow_html=True)
         st.markdown(st.session_state.error_4)
 
-    if st.session_state.level_4_solved:
-        st.markdown('<div class="custom-success-anchor"></div>', unsafe_allow_html=True)
-        st.markdown("⭐ Mastered! You evaluated the limit completely independently.")
+    if st.session_state.level_4_solved or st.session_state.get('l4_attempts', 0) >= 2:
+        if st.session_state.level_4_solved:
+            st.markdown('<div class="custom-success-anchor"></div>', unsafe_allow_html=True)
+            st.markdown("⭐ Mastered! You evaluated the limit completely independently.")
         
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
         with st.expander("📝 Explanation", expanded=True):
@@ -420,4 +437,12 @@ elif st.session_state.level == 4:
             st.markdown(f"Applying direct substitution at $x = -1$ to the simplified expression gives the final limit:\n\n$\\sqrt{{\\frac{{1}}{{-1 + {st.session_state.b}}}}} = \\sqrt{{\\frac{{1}}{{{st.session_state.b - 1}}}}} = \\frac{{1}}{{{st.session_state.a}}}$")
 
 st.subheader("✏️ Scratchpad")
-st_canvas(stroke_width=2, stroke_color="#000000", background_color="#FFFFFF", drawing_mode="freedraw", width=670, update_streamlit=False)
+st_canvas(
+    stroke_width=2, 
+    stroke_color="#000000", 
+    background_color="#FFFFFF", 
+    drawing_mode="freedraw", 
+    width=670, 
+    update_streamlit=False,
+    key=f"scratchpad_lvl_{st.session_state.level}"
+)
