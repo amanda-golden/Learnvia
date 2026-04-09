@@ -1,6 +1,6 @@
 # Interactive Limit Evaluator: EdTech Practice Module
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://solving-limits.streamlit.app/))
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://solving-limits.streamlit.app/)
 
 An interactive educational web application built with Python, Streamlit, and SymPy. This module is designed to help students master the algebraic evaluation of limits involving indeterminate forms, rational expressions, and square roots.
 
