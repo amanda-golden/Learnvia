@@ -360,8 +360,9 @@ elif st.session_state.level == 3:
 # STEP 4: Challenge Mode
 # ------------------------------------------
 elif st.session_state.level == 4:
+    refresh_mastery_problem()
     st.latex(r"\lim_{x \to -1} \sqrt{\frac{x + 1}{x^2 + %dx + %d}}" % (st.session_state.c, st.session_state.b))
-    
+
     st.markdown("**Your answer:**")
     answer_field = st.text_input("s4", key="l4_input", label_visibility="collapsed", on_change=clear_error, args=(4,))
     
