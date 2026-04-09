@@ -244,7 +244,7 @@ if st.session_state.level == 1:
         st.markdown("✓ Correct! The indeterminate form indicates a removable discontinuity — factoring is required to evaluate the limit.")
         
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
-        with st.expander("📝 View Detailed Explanation", expanded=False):
+        with st.expander("📝 Explanation", expanded=True):
             st.markdown(f"**Numerator:** $\\sqrt{{-1 + 1}} = \\sqrt{{0}} = 0$  \n**Denominator:** $(-1)^2 + {st.session_state.c}(-1) + {st.session_state.b} = 1 - {st.session_state.c} + {st.session_state.b} = 0$  \nBoth expressions evaluate to zero, yielding the indeterminate form $\\frac{{0}}{{0}}$. This indicates a **removable discontinuity** (a 'hole') in the graph. Because division by zero is undefined, algebraic manipulation is required to evaluate the limit.")
         st.button("Proceed to Step 2 ➔", on_click=advance_level, args=(2,), use_container_width=True)
 
@@ -299,7 +299,7 @@ elif st.session_state.level == 2:
         st.markdown(f"✓ Perfect! The denominator factors to $(x + 1)(x + {st.session_state.b})$.")
         
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
-        with st.expander("📝 View Detailed Explanation", expanded=False):
+        with st.expander("📝 Explanation", expanded=True):
             st.markdown(
                 f"With the denominator factored, the limit becomes:\n\n$\\sqrt{{\\frac{{x + 1}}{{(x + 1)(x + {st.session_state.b})}}}}$" +
                 "\n\nThe $(x+1)$ factors in the numerator and denominator cancel, resolving the removable discontinuity."
@@ -360,7 +360,7 @@ elif st.session_state.level == 3:
         st.markdown(f"🎉 Correct! The answer is $1/{st.session_state.a}$.")
         
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
-        with st.expander("📝 View Detailed Explanation", expanded=False):
+        with st.expander("📝 Explanation", expanded=True):
             st.markdown(f"Evaluate the limit using direct substitution at $x = -1$:\n\n$\\sqrt{{\\frac{{1}}{{-1 + {st.session_state.b}}}}} = \\sqrt{{\\frac{{1}}{{{st.session_state.b - 1}}}}} = \\frac{{1}}{{{st.session_state.a}}}$")
         st.button("🚀 Proceed to Final Challenge", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
 
@@ -405,8 +405,8 @@ elif st.session_state.level == 4:
         st.markdown("⭐ Mastered! You evaluated the limit completely independently.")
         
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
-        with st.expander("📝 View Complete Solution Breakdown", expanded=False):
-            st.markdown("### How to solve this problem:")
+        with st.expander("📝 Explanation", expanded=True):
+            st.markdown("### Let's Review!")
             
             st.markdown("**Step 1: Direct Substitution**")
             st.markdown("Substituting $x = -1$ yields the indeterminate form $\\frac{0}{0}$. This indicates a removable discontinuity, requiring algebraic manipulation to evaluate the limit.")
