@@ -262,7 +262,7 @@ elif st.session_state.level == 2:
         st.markdown(f"💡 **Hint 1:** To remove the discontinuity, factor the quadratic in the denominator. Find two integers that multiply to ${st.session_state.b}$ and add to ${st.session_state.c}$.")
     if st.session_state.hint_level >= 2:
         st.markdown('<div class="custom-hint-anchor"></div>', unsafe_allow_html=True)
-        st.markdown(f"🚨 **Hint 2 (Solution):** The integers are $1$ and ${st.session_state.b}$. The fully factored denominator is: $(x + 1)(x + {st.session_state.b})$")
+        st.markdown(f"🚨 **Hint 2 (Solution):** The integers are $1$ and ${st.session_state.b}$. The fully factored denominator is:\n\n$(x + 1)(x + {st.session_state.b})$")
     
     if submit_btn_2:
         if factor_input:
