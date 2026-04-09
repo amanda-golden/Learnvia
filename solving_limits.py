@@ -145,11 +145,19 @@ def initialize_state(target_level=1):
         'error_1': None, 'error_2': None, 'error_3': None, 'error_4': None
     })
 
-def refresh_mastery_problem():
+def refresh_mastery_problem(target_level=4):
+    """Generates a new problem, ensuring it is different from the current one."""
+    current_a = st.session_state.get('a')
     a, b, c = generate_math_vars()
+    
+    # Loop until we get a set of variables that differ from the current problem
+    while a == current_a:
+        a, b, c = generate_math_vars()
+        
     clear_inputs()
     st.session_state.update({
         'a': a, 'b': b, 'c': c,
+        'level': target_level,
         'level_4_solved': False,
         'error_4': None
     })
