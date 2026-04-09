@@ -142,11 +142,12 @@ def initialize_state(target_level=1):
         'level_3_solved': False,
         'level_4_solved': False,
         'hint_level': 0,
+        'l3_attempts': 0,
         'l4_attempts': 0,
         'error_1': None, 'error_2': None, 'error_3': None, 'error_4': None
     })
 
-def refresh_mastery_problem(target_level=4):
+def refresh_problem(target_level=4):
     """Generates a new problem, ensuring it is different from the current one."""
     current_a = st.session_state.get('a')
     a, b, c = generate_math_vars()
@@ -159,9 +160,9 @@ def refresh_mastery_problem(target_level=4):
     st.session_state.update({
         'a': a, 'b': b, 'c': c,
         'level': target_level,
-        'level_4_solved': False,
-        'l4_attempts': 0,
-        'error_4': None
+        f'level_{target_level}_solved': False,
+        f'l{target_level}_attempts': 0,
+        f'error_{target_level}': None
     })
 
 def advance_level(target_level):
@@ -178,7 +179,9 @@ def increment_hint():
 if 'level' not in st.session_state:
     initialize_state()
 
-# Ensure attempt tracker exists if we update the app mid-session
+# Ensure attempt trackers exist if we update the app mid-session
+if 'l3_attempts' not in st.session_state:
+    st.session_state.l3_attempts = 0
 if 'l4_attempts' not in st.session_state:
     st.session_state.l4_attempts = 0
 
@@ -205,7 +208,7 @@ with st.sidebar:
     st.button("✅ Step 3: Evaluation" if st.session_state.level_3_solved else "Step 3: Evaluation", on_click=advance_level, args=(3,), use_container_width=True, type="secondary")
     st.divider()
     st.header("🏆 Show Mastery")
-    st.button("✅ Final Challenge: Solo Mode" if st.session_state.level_4_solved else "Final Challenge: Solo Mode", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
+    st.button("✅ Final Challenge: Solo Mode" if st.session_state.level_4_solved else "Final Challenge: Solo Mode", on_click=refresh_problem, args=(4,), use_container_width=True, type="primary")
     st.divider()
     st.markdown('<div id="generate-btn-anchor"></div>', unsafe_allow_html=True)
     st.button("🔄 Reset Activity", on_click=initialize_state, args=(1,), use_container_width=True)
@@ -325,7 +328,13 @@ elif st.session_state.level == 3:
     
     col_submit, col_hint = st.columns(2)
     with col_submit:
-        submit_btn_3 = st.button("Check Answer", use_container_width=True, type="primary")
+        if st.session_state.get('l3_attempts', 0) >= 2 and not st.session_state.level_3_solved:
+            submit_btn_3 = st.button("Try Another Problem", on_click=refresh_problem, args=(3,), use_container_width=True, type="primary")
+            is_check_answer_3 = False
+        else:
+            submit_btn_3 = st.button("Check Answer", use_container_width=True, type="primary")
+            is_check_answer_3 = True
+
     with col_hint:
         st.markdown('<div class="stuck-anchor"></div>', unsafe_allow_html=True)
         hint_label = "💡 Stuck?" if st.session_state.hint_level == 0 else ("💡 Need another hint?" if st.session_state.hint_level == 1 else "Hide hints")
@@ -338,7 +347,7 @@ elif st.session_state.level == 3:
         st.markdown('<div class="custom-hint-anchor"></div>', unsafe_allow_html=True)
         st.markdown(f"🚨 **Hint 2:** The fraction evaluates to $1/{st.session_state.b - 1}$. Do not forget to compute the square root of that result!")
     
-    if submit_btn_3:
+    if submit_btn_3 and is_check_answer_3:
         if final_input:
             expected_val = 1 / st.session_state.a
             try:
@@ -346,12 +355,17 @@ elif st.session_state.level == 3:
                 if abs(user_val - expected_val) < 1e-4:
                     st.session_state.level_3_solved = True
                     st.session_state.error_3 = None
-                elif abs(user_val - st.session_state.a) < 1e-4:
-                    st.session_state.error_3 = "✗ Almost! You evaluated the denominator correctly, but your fraction is missing the numerator."
-                elif abs(user_val - (1 / (st.session_state.b - 1))) < 1e-4:
-                    st.session_state.error_3 = "✗ Almost! You evaluated the fraction inside the square root. Now, calculate the root itself."
                 else:
-                    st.session_state.error_3 = "✗ Incorrect. Apply direct substitution at $x = -1$ into the simplified expression and evaluate."
+                    st.session_state.l3_attempts += 1
+                    if st.session_state.l3_attempts >= 2:
+                        st.session_state.error_3 = f"✗ Incorrect. The correct answer is **1/{st.session_state.a}**. Review the explanation below and click 'Try Another Problem'."
+                    else:
+                        if abs(user_val - st.session_state.a) < 1e-4:
+                            st.session_state.error_3 = "✗ Almost! You evaluated the denominator correctly, but your fraction is missing the numerator. (1 attempt remaining)"
+                        elif abs(user_val - (1 / (st.session_state.b - 1))) < 1e-4:
+                            st.session_state.error_3 = "✗ Almost! You evaluated the fraction inside the square root. Now, calculate the root itself. (1 attempt remaining)"
+                        else:
+                            st.session_state.error_3 = "✗ Incorrect. Apply direct substitution at $x = -1$ into the simplified expression and evaluate. (1 attempt remaining)"
             except (SympifyError, ValueError, TypeError):
                 st.session_state.error_3 = "⚠️ Please enter a valid number or fraction (e.g., 1/2 or 0.5)."
         else:
@@ -361,14 +375,17 @@ elif st.session_state.level == 3:
         st.markdown('<div class="custom-error-anchor"></div>', unsafe_allow_html=True)
         st.markdown(st.session_state.error_3)
 
-    if st.session_state.level_3_solved:
-        st.markdown('<div class="custom-success-anchor"></div>', unsafe_allow_html=True)
-        st.markdown(f"🎉 Correct! The answer is $1/{st.session_state.a}$.")
+    if st.session_state.level_3_solved or st.session_state.get('l3_attempts', 0) >= 2:
+        if st.session_state.level_3_solved:
+            st.markdown('<div class="custom-success-anchor"></div>', unsafe_allow_html=True)
+            st.markdown(f"🎉 Correct! The answer is $1/{st.session_state.a}$.")
         
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
         with st.expander("📝 Explanation", expanded=True):
             st.markdown(f"Evaluate the limit using direct substitution at $x = -1$:\n\n$\\sqrt{{\\frac{{1}}{{-1 + {st.session_state.b}}}}} = \\sqrt{{\\frac{{1}}{{{st.session_state.b - 1}}}}} = \\frac{{1}}{{{st.session_state.a}}}$")
-        st.button("🚀 Proceed to Final Challenge", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
+        
+        if st.session_state.level_3_solved:
+            st.button("🚀 Proceed to Final Challenge", on_click=refresh_problem, args=(4,), use_container_width=True, type="primary")
 
 # ------------------------------------------
 # STEP 4: Challenge Mode
@@ -382,7 +399,7 @@ elif st.session_state.level == 4:
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.session_state.get('l4_attempts', 0) >= 2 and not st.session_state.level_4_solved:
-            submit_btn_4 = st.button("New Problem", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
+            submit_btn_4 = st.button("Try Another Problem", on_click=refresh_problem, args=(4,), use_container_width=True, type="primary")
             is_check_answer = False
         else:
             submit_btn_4 = st.button("Check Answer", use_container_width=True, type="primary")
@@ -390,7 +407,7 @@ elif st.session_state.level == 4:
 
     with col2:
         st.markdown('<div class="stuck-anchor"></div>', unsafe_allow_html=True)
-        st.button("New Problem", on_click=refresh_mastery_problem, use_container_width=True, key="new_prob_btn_4")
+        st.button("New Problem", on_click=refresh_problem, args=(4,), use_container_width=True, key="new_prob_btn_4")
     with col3:
         st.button("Back to Practice", on_click=advance_level, args=(1,), use_container_width=True)
 
