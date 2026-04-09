@@ -332,7 +332,6 @@ elif st.session_state.level == 3:
                 if abs(user_val - expected_val) < 1e-4:
                     st.session_state.level_3_solved = True
                     st.session_state.error_3 = None
-                    st.balloons()
                 elif abs(user_val - st.session_state.a) < 1e-4:
                     st.session_state.error_3 = "✗ Almost! You evaluated the denominator correctly, but your fraction is missing the numerator."
                 elif abs(user_val - (1 / (st.session_state.b - 1))) < 1e-4:
