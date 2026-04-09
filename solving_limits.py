@@ -408,7 +408,7 @@ elif st.session_state.level == 4:
         with st.expander("📝 Explanation", expanded=True):
             st.markdown("### Let's Review!")
             
-            st.markdown("**Step 1: Direct Substitution**")
+            st.markdown("**Step 1: Substitution**")
             st.markdown("Substituting $x = -1$ yields the indeterminate form $\\frac{0}{0}$. This indicates a removable discontinuity, requiring algebraic manipulation to evaluate the limit.")
             
             st.markdown("**Step 2: Factorization**")
