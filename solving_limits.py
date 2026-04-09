@@ -191,7 +191,7 @@ with st.sidebar:
     st.button("✅ Step 3: Evaluation" if st.session_state.level_3_solved else "Step 3: Evaluation", on_click=advance_level, args=(3,), use_container_width=True, type="secondary")
     st.divider()
     st.header("🏆 Show Mastery")
-    st.button("✅ Final Challenge: Solo Mode" if st.session_state.level_4_solved else "Final Challenge: Solo Mode", on_click=advance_level, args=(4,), use_container_width=True, type="primary")
+    st.button("✅ Final Challenge: Solo Mode" if st.session_state.level_4_solved else "Final Challenge: Solo Mode", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
     st.divider()
     st.markdown('<div id="generate-btn-anchor"></div>', unsafe_allow_html=True)
     st.button("🔄 Reset Activity", on_click=initialize_state, args=(1,), use_container_width=True)
@@ -354,13 +354,12 @@ elif st.session_state.level == 3:
         st.markdown('<div class="explanation-anchor"></div>', unsafe_allow_html=True)
         with st.expander("📝 View Detailed Explanation", expanded=False):
             st.markdown(f"Evaluate the limit using direct substitution at $x = -1$:\n\n$\\sqrt{{\\frac{{1}}{{-1 + {st.session_state.b}}}}} = \\sqrt{{\\frac{{1}}{{{st.session_state.b - 1}}}}} = \\frac{{1}}{{{st.session_state.a}}}$")
-        st.button("🚀 Proceed to Final Challenge", on_click=advance_level, args=(4,), use_container_width=True, type="primary")
+        st.button("🚀 Proceed to Final Challenge", on_click=refresh_mastery_problem, args=(4,), use_container_width=True, type="primary")
 
 # ------------------------------------------
 # STEP 4: Challenge Mode
 # ------------------------------------------
 elif st.session_state.level == 4:
-    refresh_mastery_problem()
     st.latex(r"\lim_{x \to -1} \sqrt{\frac{x + 1}{x^2 + %dx + %d}}" % (st.session_state.c, st.session_state.b))
 
     st.markdown("**Your answer:**")
