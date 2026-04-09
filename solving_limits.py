@@ -388,9 +388,6 @@ elif st.session_state.level == 4:
                     st.session_state.error_4 = "✗ Incorrect. Try mapping out your factorization steps on the scratchpad!"
             except (SympifyError, ValueError, TypeError):
                  st.session_state.error_4 = "⚠️ Please enter a valid number or fraction."
-        else:
-            st.session_state.error_4 = "⚠️ Please enter an answer before checking."
-
 
     if st.session_state.error_4 and not st.session_state.level_4_solved:
         st.markdown('<div class="custom-error-anchor"></div>', unsafe_allow_html=True)
